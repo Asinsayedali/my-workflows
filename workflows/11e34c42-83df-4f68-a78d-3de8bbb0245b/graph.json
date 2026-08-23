@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "workflow": {
+    "id": "11e34c42-83df-4f68-a78d-3de8bbb0245b",
+    "name": "New workflow"
+  },
+  "compiledScriptHash": "5a3fc54e",
+  "nodes": [
+    {
+      "id": "manual_trigger_1",
+      "type": "manual_trigger",
+      "position": {
+        "x": 280,
+        "y": 180
+      },
+      "data": {
+        "samplePayload": {
+          "test": true
+        }
+      }
+    },
+    {
+      "id": "set_1",
+      "type": "set",
+      "position": {
+        "x": 580,
+        "y": 180
+      },
+      "data": {
+        "mode": "replace",
+        "source": "{{$json}}",
+        "fields": {
+          "message": "hello from nodes2cloud",
+          "githubVersioningTest": "true"
+        },
+        "dotNotation": true,
+        "jsonMode": false,
+        "jsonExpression": "{{$json}}"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_manual_to_set",
+      "source": "manual_trigger_1",
+      "target": "set_1"
+    }
+  ],
+  "settings": {}
+}
