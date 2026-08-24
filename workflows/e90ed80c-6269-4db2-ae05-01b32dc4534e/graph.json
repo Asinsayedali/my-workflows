@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "workflow": {
+    "id": "e90ed80c-6269-4db2-ae05-01b32dc4534e",
+    "name": "new"
+  },
+  "compiledScriptHash": "bbf42e20",
+  "nodes": [
+    {
+      "id": "node_1785876139401_2",
+      "type": "manual_trigger",
+      "position": {
+        "x": 320,
+        "y": 266.03999999999996
+      },
+      "data": {
+        "samplePayload": {}
+      }
+    },
+    {
+      "id": "node_1787576548290_2",
+      "type": "set",
+      "position": {
+        "x": 920.1837450645306,
+        "y": 313.50875787461626
+      },
+      "data": {
+        "mode": "merge",
+        "source": "{{$json}}",
+        "fields": {},
+        "dotNotation": true,
+        "jsonMode": false,
+        "jsonExpression": "{{$json}}"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "xy-edge__node_1785876139401_2out-node_1787576548290_2in",
+      "source": "node_1785876139401_2",
+      "target": "node_1787576548290_2",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    }
+  ],
+  "settings": {}
+}
