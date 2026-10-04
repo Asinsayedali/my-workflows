@@ -4,8 +4,8 @@
     "id": "e90ed80c-6269-4db2-ae05-01b32dc4534e",
     "name": "new"
   },
-  "versionNumber": 31,
-  "compiledScriptHash": "9df5682f",
+  "versionNumber": 32,
+  "compiledScriptHash": "d37f67bf",
   "nodes": [
     {
       "id": "manual_trigger_1",
@@ -21,29 +21,8 @@
           "html": "<h1>Title</h1><p>Hello <strong>world</strong> and <em>you</em>. See <a href=\"https://n2c.dev\">N2C</a>.</p><blockquote><p>A quote</p></blockquote><p>Line one<br>Line two</p><ul><li>One</li><li>Two</li></ul><ol><li>First</li><li>Second</li></ol><table><tr><th>Name</th><th>Qty</th></tr><tr><td>Apple</td><td>3</td></tr></table><p><img src=\"https://n2c.dev/logo.png\" alt=\"logo\"></p><pre><code class=\"language-js\">if (a &lt; b &amp;&amp; b &gt; c) {}</code></pre><p>Tom &amp; Jerry</p>"
         }
       }
-    },
-    {
-      "id": "node_1790956005285_6",
-      "type": "convert_to_file",
-      "position": {
-        "x": -1206.9008967927912,
-        "y": 816.3614812982087
-      },
-      "data": {
-        "format": "html",
-        "data": "{{$node.manual_trigger_1}}",
-        "fileName": "export.html"
-      }
     }
   ],
-  "edges": [
-    {
-      "id": "xy-edge__manual_trigger_1out-node_1790956005285_6in",
-      "source": "manual_trigger_1",
-      "target": "node_1790956005285_6",
-      "sourceHandle": "out",
-      "targetHandle": "in"
-    }
-  ],
+  "edges": [],
   "settings": {}
 }
