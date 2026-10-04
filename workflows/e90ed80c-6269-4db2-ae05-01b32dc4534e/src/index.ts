@@ -80,7 +80,93 @@ export default {
         if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "manual_trigger_1", nodeType: "manual_trigger", status: "success", input: __ccSnapshot({}, 32768), output: __ccSnapshot(ctx.nodes["manual_trigger_1"], 32768) }); }
         console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "manual_trigger_1", phase: "success", input: __ccSnapshot({}, 32768), output: __ccSnapshot(ctx.nodes["manual_trigger_1"], 32768) }));
       }
+      // === Node: node_1790919570174_4 (markdown) ===
+      {
+        const __ccStart = Date.now();
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1790919570174_4", phase: "executing" }));
+        ctx.nodes["node_1790919570174_4"] = (() => { const __src = (v, keys) => {
+  if (typeof v === "string") return v;
+  if (v === undefined || v === null) throw new Error("Markdown: Source resolved to nothing — check the field path (e.g. {{$json.markdown}}). When calling a deployed Manual Trigger, send the payload as the JSON request body.");
+  if (typeof v === "object") {
+    if (Array.isArray(v)) throw new Error("Markdown: Source is an object, not text — pick one of its text fields, e.g. {{$json.markdown}}.");
+    for (const k of keys) if (typeof v[k] === "string") return v[k];
+    const s = Object.values(v).filter((x) => typeof x === "string");
+    if (s.length === 1) return s[0];
+    throw new Error("Markdown: Source is an object, not text — pick one of its text fields, e.g. {{$json.markdown}}.");
+  }
+  return String(v);
+}; const __md = __src(ctx.input, ["markdown","md","text","content","body"]); const __esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+const __inline = (s) => {
+  const __codes = [];
+  const __marker = "\u0001CCCODE\u0001";
+  const __protected = s.replace(/\`([^\`]+)\`/g, (__m, __code) => { __codes.push(__code); return __marker + (__codes.length - 1) + __marker; });
+  let __out = __esc(__protected).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>").replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">').replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  const __markerRe = new RegExp(__marker + "(\\d+)" + __marker, "g");
+  return __out.replace(__markerRe, (__m, __idx) => "<code>" + __esc(__codes[Number(__idx)]) + "</code>");
+};
+const __splitRow = (row) => row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+const __lines = __md.split(/\r?\n/);
+const __html = [];
+let __listType = null;
+let __inBq = false;
+const __closeList = () => { if (__listType) { __html.push("</" + __listType + ">"); __listType = null; } };
+const __closeBq = () => { if (__inBq) { __html.push("</blockquote>"); __inBq = false; } };
+for (let __i = 0; __i < __lines.length; __i++) {
+  const __ln = __lines[__i];
+  const __fence = __ln.match(/^\`\`\`(\S*)\s*$/);
+  if (__fence) {
+    __closeList();
+    __closeBq();
+    const __lang = __fence[1];
+    const __codeLines = [];
+    let __j = __i + 1;
+    while (__j < __lines.length && !/^\`\`\`\s*$/.test(__lines[__j].trim())) { __codeLines.push(__lines[__j]); __j++; }
+    const __cls = __lang ? ' class="language-' + __lang + '"' : "";
+    __html.push("<pre><code" + __cls + ">" + __esc(__codeLines.join("\n")) + "</code></pre>");
+    __i = __j;
+    continue;
+  }
+  if (/^\|.*\|$/.test(__ln.trim()) && __i + 1 < __lines.length && /^\|[\s:|-]+\|$/.test(__lines[__i + 1].trim())) {
+    __closeList();
+    __closeBq();
+    const __headerCells = __splitRow(__ln);
+    __html.push("<table><thead><tr>" + __headerCells.map((c) => "<th>" + __inline(c) + "</th>").join("") + "</tr></thead><tbody>");
+    let __j = __i + 2;
+    while (__j < __lines.length && /^\|.*\|$/.test(__lines[__j].trim())) {
+      const __cells = __splitRow(__lines[__j]);
+      __html.push("<tr>" + __cells.map((c) => "<td>" + __inline(c) + "</td>").join("") + "</tr>");
+      __j++;
+    }
+    __html.push("</tbody></table>");
+    __i = __j - 1;
+    continue;
+  }
+  const __h = __ln.match(/^(#{1,6})\s+(.*)$/);
+  if (__h) { __closeList(); __closeBq(); const __n = __h[1].length; __html.push("<h" + __n + ">" + __inline(__h[2]) + "</h" + __n + ">"); continue; }
+  const __bq = __ln.match(/^>\s?(.*)$/);
+  if (__bq) { __closeList(); if (!__inBq) { __html.push("<blockquote>"); __inBq = true; } __html.push("<p>" + __inline(__bq[1]) + "</p>"); continue; }
+  __closeBq();
+  const __ol = __ln.match(/^\d+\.\s+(.*)$/);
+  if (__ol) { if (__listType !== "ol") { __closeList(); __html.push("<ol>"); __listType = "ol"; } __html.push("<li>" + __inline(__ol[1]) + "</li>"); continue; }
+  const __li = __ln.match(/^[-*]\s+(.*)$/);
+  if (__li) { if (__listType !== "ul") { __closeList(); __html.push("<ul>"); __listType = "ul"; } __html.push("<li>" + __inline(__li[1]) + "</li>"); continue; }
+  if (__ln.trim() === "") { __closeList(); continue; }
+  __closeList();
+  __html.push("<p>" + __inline(__ln) + "</p>");
+}
+__closeList();
+__closeBq();
+return __html.join("\n"); })();
+        env.CC_ANALYTICS?.writeDataPoint({
+          blobs: [ctx.workflow.id, ctx.execution.id, "node_1790919570174_4", "markdown", "success"],
+          doubles: [Date.now() - __ccStart],
+          indexes: [ctx.workflow.id],
+        });
+        if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "node_1790919570174_4", nodeType: "markdown", status: "success", input: __ccSnapshot({ "manual_trigger_1": ctx.nodes["manual_trigger_1"] }, 32768), output: __ccSnapshot(ctx.nodes["node_1790919570174_4"], 32768) }); }
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1790919570174_4", phase: "success", input: __ccSnapshot({ "manual_trigger_1": ctx.nodes["manual_trigger_1"] }, 32768), output: __ccSnapshot(ctx.nodes["node_1790919570174_4"], 32768) }));
+      }
 
+      ctx.output = ctx.nodes["node_1790919570174_4"] ?? ctx.output;
       return new Response(JSON.stringify(ctx.output), { status: 200, headers: { "Content-Type": "application/json" } });
     } catch (err) {
       __ccStatus = "error";

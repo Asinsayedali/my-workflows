@@ -4,25 +4,42 @@
     "id": "e90ed80c-6269-4db2-ae05-01b32dc4534e",
     "name": "new"
   },
-  "versionNumber": 32,
-  "compiledScriptHash": "d37f67bf",
+  "versionNumber": 29,
+  "compiledScriptHash": "06a47333",
   "nodes": [
     {
       "id": "manual_trigger_1",
       "type": "manual_trigger",
       "position": {
-        "x": -1623.7008235506037,
-        "y": 652.3614812982087
+        "x": -1115.7008235506037,
+        "y": 1030.3614812982087
       },
       "data": {
-        "samplePayload": {
-          "title": "Release Notes",
-          "markdown": "# Release Notes\n\nThis is **bold**, *italic* and `inline <code>` text.\n\nVisit [N2C](https://n2c.dev) or see ![logo](https://n2c.dev/logo.png)\n\n> Quoted line one\n> Quoted line two\n\n1. First\n2. Second\n\n- Apple\n- Banana\n\n| Name | Qty |\n|---|---|\n| Apple | 3 |\n| Banana | 5 |\n\n```js\nif (a < b && b > c) {}\n```\n\nEscape test: 5 > 3 & \"quotes\"",
-          "html": "<h1>Title</h1><p>Hello <strong>world</strong> and <em>you</em>. See <a href=\"https://n2c.dev\">N2C</a>.</p><blockquote><p>A quote</p></blockquote><p>Line one<br>Line two</p><ul><li>One</li><li>Two</li></ul><ol><li>First</li><li>Second</li></ol><table><tr><th>Name</th><th>Qty</th></tr><tr><td>Apple</td><td>3</td></tr></table><p><img src=\"https://n2c.dev/logo.png\" alt=\"logo\"></p><pre><code class=\"language-js\">if (a &lt; b &amp;&amp; b &gt; c) {}</code></pre><p>Tom &amp; Jerry</p>"
-        }
+        "samplePayload": ""
+      }
+    },
+    {
+      "id": "node_1790919570174_4",
+      "type": "markdown",
+      "position": {
+        "x": -729.9008357576349,
+        "y": 1029.3614202630524
+      },
+      "data": {
+        "direction": "markdownToHtml",
+        "source": "{{$json}}",
+        "wrapHtmlDocument": false
       }
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "id": "xy-edge__manual_trigger_1out-node_1790919570174_4in",
+      "source": "manual_trigger_1",
+      "target": "node_1790919570174_4",
+      "sourceHandle": "out",
+      "targetHandle": "in"
+    }
+  ],
   "settings": {}
 }
