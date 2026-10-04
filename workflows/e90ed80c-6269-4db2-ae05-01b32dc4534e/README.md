@@ -6,8 +6,7 @@ compiled script in `src/index.ts` is exactly what N2C would deploy for this work
 ## Deploy
 
 1. `npx wrangler login` (if you haven't already).
-2. Create each KV namespace referenced in `wrangler.jsonc` and replace its `id` placeholder: `npx wrangler kv namespace create <binding>`.
-3. `npx wrangler deploy`.
+2. `npx wrangler deploy`.
 
 ## Required secrets
 

@@ -12,7 +12,13 @@
   "kv_namespaces": [
     {
       "binding": "CC_RUN_KV",
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+      "id": "6d7f06fd676a4730b9ecdf81f154961c"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "CC_FILE_STAGING",
+      "bucket_name": "cc-e90ed80c-6269-4db2-ae05-01b32dc4534e-cc-file-staging"
     }
   ],
   "analytics_engine_datasets": [

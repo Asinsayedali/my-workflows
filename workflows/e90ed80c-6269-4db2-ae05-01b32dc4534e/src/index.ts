@@ -32,52 +32,167 @@ export default {
       node: {},
     };
 
+    function __ccSnapshot(value, maxBytes) {
+      var __ccSecretKeyRe = /(^|[_-])(api[_-]?key|apikey|access[_-]?token|token|secret|password|passwd|pwd|auth|authorization|bearer|client[_-]?secret|private[_-]?key|credential)($|[_-])/i;
+      function __ccRedact(v, keyName) {
+        if (typeof v === "string") {
+          return keyName && __ccSecretKeyRe.test(keyName) ? "[redacted]" : v;
+        }
+        if (Array.isArray(v)) {
+          return v.map(function (x) { return __ccRedact(x, keyName); });
+        }
+        if (v && typeof v === "object") {
+          if (v.__file && typeof v.__file === "object") {
+            return { __file: true, name: v.__file.name, mime: v.__file.mime, size: v.__file.size };
+          }
+          var out = {};
+          for (var k in v) {
+            if (Object.prototype.hasOwnProperty.call(v, k)) out[k] = __ccRedact(v[k], k);
+          }
+          return out;
+        }
+        return v;
+      }
+      try {
+        var redacted = __ccRedact(value, "");
+        var json = JSON.stringify(redacted);
+        if (json === undefined) return { value: undefined, truncated: false };
+        if (json.length <= maxBytes) return { value: redacted, truncated: false };
+        return { preview: json.slice(0, maxBytes), truncated: true };
+      } catch (e) {
+        return { preview: "[unserializable]", truncated: true };
+      }
+    }
     const __ccRunLog = [];
     let __ccStatus = "success";
     let __ccError;
     try {
-      // === Node: node_1785876139401_2 (manual_trigger) ===
+      // === Node: manual_trigger_1 (manual_trigger) ===
       {
         const __ccStart = Date.now();
-        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1785876139401_2", phase: "executing" }));
-        ctx.nodes["node_1785876139401_2"] = ctx.input;
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "manual_trigger_1", phase: "executing" }));
+        ctx.nodes["manual_trigger_1"] = ctx.input;
         env.CC_ANALYTICS?.writeDataPoint({
-          blobs: [ctx.workflow.id, ctx.execution.id, "node_1785876139401_2", "manual_trigger", "success"],
+          blobs: [ctx.workflow.id, ctx.execution.id, "manual_trigger_1", "manual_trigger", "success"],
           doubles: [Date.now() - __ccStart],
           indexes: [ctx.workflow.id],
         });
-        if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "node_1785876139401_2", nodeType: "manual_trigger", status: "success" }); }
-        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1785876139401_2", phase: "success" }));
+        if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "manual_trigger_1", nodeType: "manual_trigger", status: "success", input: __ccSnapshot({}, 32768), output: __ccSnapshot(ctx.nodes["manual_trigger_1"], 32768) }); }
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "manual_trigger_1", phase: "success", input: __ccSnapshot({}, 32768), output: __ccSnapshot(ctx.nodes["manual_trigger_1"], 32768) }));
       }
-      // === Node: node_1787576548290_2 (set) ===
+      // === Node: node_1790956005285_6 (convert_to_file) ===
       {
         const __ccStart = Date.now();
-        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1787576548290_2", phase: "executing" }));
-        ctx.nodes["node_1787576548290_2"] = Object.assign({}, ctx.input, (() => {
-  const __ccSetPath = (obj, path, value) => {
-    const parts = String(path).split(".");
-    let cur = obj;
-    for (let i = 0; i < parts.length - 1; i++) {
-      const k = parts[i];
-      if (typeof cur[k] !== "object" || cur[k] === null || Array.isArray(cur[k])) cur[k] = {};
-      cur = cur[k];
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1790956005285_6", phase: "executing" }));
+        function __ccIsFileRef(v) {
+  return !!(v && typeof v === "object" && v.__file && typeof v.__file === "object" && v.__file.src);
+}
+function __ccBytesToB64(bytes) {
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary);
+}
+function __ccB64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+}
+async function __ccToFileRef(opts) {
+  const bytes = typeof opts.data === "string" ? new TextEncoder().encode(opts.data) : opts.data;
+  const threshold = opts.threshold ?? 262144;
+  const meta = { name: opts.name, mime: opts.mime, size: bytes.length };
+  if (bytes.length <= threshold || !opts.r2) {
+    return { __file: { ...meta, src: { inline: __ccBytesToB64(bytes) } } };
+  }
+  const key = "cc-staging/" + (opts.runId || "run") + "/" + crypto.randomUUID() + "-" + opts.name;
+  await opts.r2.put(key, bytes);
+  return { __file: { ...meta, src: { r2Key: key } } };
+}
+async function __ccFileRefBytes(ref, r2) {
+  const src = ref.__file.src;
+  if (src.inline !== undefined) return __ccB64ToBytes(src.inline);
+  if (!r2) throw new Error("FileRef is R2-staged but no staging binding is available");
+  const obj = await r2.get(src.r2Key);
+  if (!obj) throw new Error("Staged file not found: " + src.r2Key);
+  return new Uint8Array(await obj.arrayBuffer());
+}
+async function __ccFileRefSize(ref, r2) {
+  const src = ref.__file.src;
+  if (src.inline !== undefined) return __ccB64ToBytes(src.inline).length;
+  if (!r2) throw new Error("FileRef is R2-staged but no staging binding is available");
+  const head = await r2.head(src.r2Key);
+  if (!head) throw new Error("Staged file not found: " + src.r2Key);
+  // R2's own view, not `__file.size` — the metadata was written by whoever
+  // produced the ref, and an upload that disagrees with the object by even a
+  // byte fails the whole transfer with an opaque error from the far end.
+  return head.size;
+}
+async function __ccFileRefStream(ref, r2, size) {
+  const src = ref.__file.src;
+  // An inline ref is bounded by the staging threshold, so its bytes are already
+  // in memory and `fetch` can derive Content-Length from them directly.
+  if (src.inline !== undefined) return __ccB64ToBytes(src.inline);
+  if (!r2) throw new Error("FileRef is R2-staged but no staging binding is available");
+  const obj = await r2.get(src.r2Key);
+  if (!obj) throw new Error("Staged file not found: " + src.r2Key);
+  // FixedLengthStream, not obj.body directly: a plain stream body makes the
+  // runtime send Transfer-Encoding: chunked, which upload endpoints reject.
+  // This declares the length so the whole file moves in ONE request.
+  const fixed = new FixedLengthStream(size);
+  // Deliberately not awaited — the pipe only drains as fetch consumes the
+  // readable end, so awaiting here would deadlock before the request is sent.
+  obj.body.pipeTo(fixed.writable).catch(() => {});
+  return fixed.readable;
+}
+async function __ccStreamToFileRef(opts) {
+  const res = opts.res;
+  const threshold = opts.threshold ?? 262144;
+  const declared = Number(res.headers.get("content-length"));
+  const size = Number.isFinite(declared) && declared > 0 ? declared : undefined;
+  const streamable = opts.r2 && size !== undefined && size > threshold;
+  if (!streamable) {
+    // Three ways to land here: no staging binding, a body small enough that a
+    // round-trip to R2 costs more than inlining it, or no Content-Length (R2
+    // will not take a stream of unknown length). All of them buffer, so all of
+    // them are bounded.
+    const buffered = new Uint8Array(await res.arrayBuffer());
+    if (buffered.length > 33554432) {
+      throw new Error(
+        "This file is " + (buffered.length / 1048576).toFixed(1) + " MB and could not be streamed to storage" +
+        (opts.r2 ? " (the server sent no Content-Length)" : " (this workflow has no R2 staging binding)") +
+        ", so it had to be held in memory. Add an R2 staging binding, or use a source that reports a size."
+      );
     }
-    cur[parts[parts.length - 1]] = value;
-  };
-  const __out = {};
-  for (const [__k, __v] of []) { __ccSetPath(__out, __k, __v); }
-  return __out;
-})());
+    return __ccToFileRef({
+      name: opts.name,
+      mime: opts.mime,
+      data: buffered,
+      r2: opts.r2,
+      runId: opts.runId,
+      threshold,
+    });
+  }
+  // The whole point: bytes go response -> R2 without ever being a JS value, so
+  // peak memory is one chunk rather than the file (and never the ~1.33x a
+  // base64 inline would cost). Bounded by R2's own object limits, not ours.
+  const key = "cc-staging/" + (opts.runId || "run") + "/" + crypto.randomUUID() + "-" + opts.name;
+  await opts.r2.put(key, res.body, { httpMetadata: { contentType: opts.mime } });
+  return { __file: { name: opts.name, mime: opts.mime, size, src: { r2Key: key } } };
+}
+        const node_1790956005285_6_data = ctx.nodes["manual_trigger_1"];
+        const node_1790956005285_6_payload = String(node_1790956005285_6_data);
+        const node_1790956005285_6_mime = "text/html";
+        const node_1790956005285_6_out = await __ccToFileRef({ name: String("export.html"), mime: node_1790956005285_6_mime, data: node_1790956005285_6_payload, r2: env.CC_FILE_STAGING, runId: ctx.execution.id });
+        ctx.nodes["node_1790956005285_6"] = node_1790956005285_6_out;
         env.CC_ANALYTICS?.writeDataPoint({
-          blobs: [ctx.workflow.id, ctx.execution.id, "node_1787576548290_2", "set", "success"],
+          blobs: [ctx.workflow.id, ctx.execution.id, "node_1790956005285_6", "convert_to_file", "success"],
           doubles: [Date.now() - __ccStart],
           indexes: [ctx.workflow.id],
         });
-        if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "node_1787576548290_2", nodeType: "set", status: "success" }); }
-        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1787576548290_2", phase: "success" }));
+        if (__ccRunLog.length < 500) { __ccRunLog.push({ nodeId: "node_1790956005285_6", nodeType: "convert_to_file", status: "success", input: __ccSnapshot({ "manual_trigger_1": ctx.nodes["manual_trigger_1"] }, 32768), output: __ccSnapshot(ctx.nodes["node_1790956005285_6"], 32768) }); }
+        console.log("__CC_DEBUG__" + JSON.stringify({ nodeId: "node_1790956005285_6", phase: "success", input: __ccSnapshot({ "manual_trigger_1": ctx.nodes["manual_trigger_1"] }, 32768), output: __ccSnapshot(ctx.nodes["node_1790956005285_6"], 32768) }));
       }
 
-      return new Response(JSON.stringify(ctx.output), { status: 202, headers: { "Content-Type": "application/json" } });
+      ctx.output = ctx.nodes["node_1790956005285_6"] ?? ctx.output;
+      return new Response(JSON.stringify(ctx.output), { status: 200, headers: { "Content-Type": "application/json" } });
     } catch (err) {
       __ccStatus = "error";
       __ccError = err;
